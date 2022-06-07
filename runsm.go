@@ -31,6 +31,7 @@
  *	2020-12-04	Bumped to v2.7, Caddy v2
  *	2021-06-24	Integrated EBC
  *	2022-03-29	Suppress IP monitoring by default
+ *  2022-06-06	Include tzdata
  *
  */
 
@@ -50,11 +51,12 @@ import (
 	"strings"
 	"syscall"
 	"time"
+	_ "time/tzdata"
 
 	"github.com/pkg/browser"
 )
 
-const myPROGTITLE = "ScoreMaster Server v3.1"
+const myPROGTITLE = "ScoreMaster Server v3.1.1"
 const myWINTITLE = "IBA ScoreMaster"
 
 var phpcgi = filepath.Join("php", "php-cgi")
