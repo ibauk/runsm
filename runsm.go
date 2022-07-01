@@ -32,6 +32,7 @@
  *	2021-06-24	Integrated EBC
  *	2022-03-29	Suppress IP monitoring by default
  *  2022-06-06	Include tzdata
+ *	2022-07-01	-cdebug
  *
  */
 
@@ -56,13 +57,14 @@ import (
 	"github.com/pkg/browser"
 )
 
-const myPROGTITLE = "ScoreMaster Server v3.1.1"
+const myPROGTITLE = "ScoreMaster Server v3.2"
 const myWINTITLE = "IBA ScoreMaster"
 
 var phpcgi = filepath.Join("php", "php-cgi")
 var phpdbg = ""
 
 var debug = flag.Bool("debug", false, "Run in PHP debug mode")
+var cdebug = flag.Bool("cdebug", false, "Include Caddy logging")
 var port = flag.String("port", "80", "Webserver port specification")
 var alternateWebPort = flag.String("altport", "2015", "Alternate webserver port")
 var ipspec = flag.String("ip", "*", "Webserver IP specification")
@@ -284,16 +286,20 @@ func runCaddy() context.CancelFunc {
 	// Create the conf file
 	cp := filepath.Join(smCaddyFolder, "caddyfile")
 
-	// ep := filepath.Join(smCaddyFolder, "error.log")
+	ep := filepath.Join(smCaddyFolder, "error.log")
 	f, err := os.Create(cp)
 	if err != nil {
 		log.Fatal(err)
 	}
-	f.WriteString("{\nhttp_port " + *port + "\n}\n")
+	f.WriteString("{\nhttp_port " + *port + "\n")
+	if *cdebug {
+		f.WriteString("debug\n")
+		f.WriteString("log {\noutput file " + ep + "\n}\n")
+	}
+	f.WriteString("}\n")
 	f.WriteString(*ipspec + ":" + *port + "\n")
 	f.WriteString("file_server\n")
 	f.WriteString("root sm\n")
-	//f.WriteString("log {\noutput file " + ep + "\n}\n")
 	f.WriteString("php_fastcgi " + cgiport + "\n")
 	f.Close()
 
