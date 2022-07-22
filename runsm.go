@@ -33,6 +33,7 @@
  *	2022-03-29	Suppress IP monitoring by default
  *  2022-06-06	Include tzdata
  *	2022-07-01	-cdebug
+ *	2022-07-16	Fixed IP specification handling
  *
  */
 
@@ -57,7 +58,7 @@ import (
 	"github.com/pkg/browser"
 )
 
-const myPROGTITLE = "ScoreMaster Server v3.2"
+const myPROGTITLE = "ScoreMaster Server v3.2.1"
 const myWINTITLE = "IBA ScoreMaster"
 
 var phpcgi = filepath.Join("php", "php-cgi")
@@ -67,7 +68,7 @@ var debug = flag.Bool("debug", false, "Run in PHP debug mode")
 var cdebug = flag.Bool("cdebug", false, "Include Caddy logging")
 var port = flag.String("port", "80", "Webserver port specification")
 var alternateWebPort = flag.String("altport", "2015", "Alternate webserver port")
-var ipspec = flag.String("ip", "*", "Webserver IP specification")
+var ipspec = flag.String("ip", "", "Webserver IP specification")
 var spawnInterval = flag.Int("respawn", 60, "Number of minutes before restarting PHP server")
 var nolocal = flag.Bool("nolocal", false, "Don't start a web browser on the host machine")
 var ipWatch = flag.Bool("watch", false, "Monitor/report IP address changes")
@@ -190,9 +191,14 @@ func monitorIP(serverIP net.IP) {
 
 func showInvite() {
 
+	mystarturl := starturl
+	if *ipspec != "" {
+		mystarturl = "http://" + *ipspec
+	}
+
 	time.Sleep(5 * time.Second)
-	fmt.Println(timestamp() + " presenting " + starturl + ":" + *port)
-	browser.OpenURL(starturl + ":" + *port)
+	fmt.Println(timestamp() + " presenting " + mystarturl + ":" + *port)
+	browser.OpenURL(mystarturl + ":" + *port)
 
 }
 
