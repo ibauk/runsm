@@ -34,6 +34,7 @@
  *  2022-06-06	Include tzdata
  *	2022-07-01	-cdebug
  *	2022-07-16	Fixed IP specification handling
+ *	2022-11-24	Enhanced error reporting
  *
  */
 
@@ -58,7 +59,7 @@ import (
 	"github.com/pkg/browser"
 )
 
-const myPROGTITLE = "ScoreMaster Server v3.2.1"
+const myPROGTITLE = "ScoreMaster Server v3.3"
 const myWINTITLE = "IBA ScoreMaster"
 
 var phpcgi = filepath.Join("php", "php-cgi")
@@ -315,6 +316,7 @@ func runCaddy() context.CancelFunc {
 	fp := filepath.Join(smCaddyFolder, "caddy")
 
 	if err := exec.CommandContext(ctx, fp, "start", "--config", cp, "--adapter", "caddyfile").Run(); err != nil {
+		log.Println(("Unable to launch Caddy, is it already running?"))
 		log.Fatal(err)
 	}
 	return cancel
